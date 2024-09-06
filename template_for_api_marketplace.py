@@ -15,9 +15,22 @@ from utils.status_codes import StatusCodes
 from uuid import uuid4
 from api.models import AudioCraftRequestCall,AudioCraftRequestResult, response_template
 
+from crewai import Agent, Task, Crew
+from crewai_tools import ScrapeWebsiteTool, SerperDevTool
+from crewai import Crew, Process
+from langchain_groq import ChatGroq
+
 # Load environment variables
 load_dotenv()  # Take environment variables from.env.
 app.config.from_object(__name__)  # Load config from object
+
+
+
+SERPER_API_KEY = os.getenv('SERPER_API_KEY')
+llm = ChatGroq(groq_api_key=os.getenv('GROQ_API_KEY'), model='llama-3.1-70b-versatile', temperature=0.1)
+
+search_tool = SerperDevTool()
+scrape_tool = ScrapeWebsiteTool()
 
 # Load JSON configuration
 with open('config.json') as f:
@@ -36,11 +49,102 @@ webhook_url = "http://localhost:8000/callback"
 
 ############### ADD YOUR CUSTOM AI AGENT CALL HERE ###############
 def hello_world():
+    stock_selection = "AAPL"
     start_time = time.time()
+
+    data_analyst_agent = Agent(
+        role="Data Analyst",
+        goal="Monitor and analyze market data in real-time "
+             "to identify trends and predict market movements.",
+        backstory="Specializing in financial markets, this agent "
+                  "uses statistical modeling and machine learning "
+                  "to provide crucial insights. With a knack for data, "
+                  "the Data Analyst Agent is the cornerstone for "
+                  "informing trading decisions.",
+        verbose=True,
+        allow_delegation=True,
+        tools=[scrape_tool, search_tool],
+        llm=llm,
+    )
+
+    trading_strategy_agent = Agent(
+        role="Trading Strategy Developer",
+        goal="Develop and test various trading strategies based "
+             "on insights from the Data Analyst Agent.",
+        backstory="Equipped with a deep understanding of financial "
+                  "markets and quantitative analysis, this agent "
+                  "devises and refines trading strategies. It evaluates "
+                  "the performance of different approaches to determine "
+                  "the most profitable and risk-averse options.",
+        verbose=True,
+        allow_delegation=True,
+        tools=[scrape_tool, search_tool],
+        llm=llm,
+    )
+
+    # Task for Data Analyst Agent: Analyze Market Data
+    data_analysis_task = Task(
+        description=(
+            "Continuously monitor and analyze market data for "
+            "the selected stock ({stock_selection}). "
+            "Use statistical modeling and machine learning to "
+            "identify trends and predict market movements."
+        ),
+        expected_output=(
+            "Insights and alerts about significant market "
+            "opportunities or threats for {stock_selection}."
+        ),
+        agent=data_analyst_agent,
+    )
+
+    # Task for Trading Strategy Agent: Develop Trading Strategies
+    strategy_development_task = Task(
+        description=(
+            "Develop and refine trading strategies based on "
+            "the insights from the Data Analyst and "
+            # "user-defined risk tolerance ({risk_tolerance}). "
+            # "Consider trading preferences ({trading_strategy_preference})."
+        ),
+        expected_output=(
+            "A set of potential trading strategies for {stock_selection} "
+            "that align with the user's risk tolerance."
+        ),
+        agent=trading_strategy_agent,
+    )
+
+    # Define the crew with agents and tasks
+    financial_trading_crew = Crew(
+        agents=[
+            data_analyst_agent,
+            trading_strategy_agent,
+            # execution_agent,
+            # risk_management_agent
+        ],
+
+        tasks=[
+            data_analysis_task,
+            strategy_development_task,
+            # execution_planning_task,
+            # risk_assessment_task
+        ],
+
+        manager_llm=llm,
+        process=Process.sequential,
+        verbose=True,
+    )
+
+    result = financial_trading_crew.kickoff(inputs={
+        'stock_selection': stock_selection,
+        # 'initial_capital': initial_capital,
+        # 'risk_tolerance': risk_tolerance,
+        # 'trading_strategy_preference': trading_strategy_preference,
+        # 'news_impact_consideration': news_impact_consideration
+    })
+
     time.sleep(5)  # Placeholder for actual task processing
     end_time = time.time()
     processing_duration = end_time - start_time  # Calculate processing duration in seconds
-    return "Hello World", processing_duration
+    return str(result), processing_duration
 
 
 
@@ -193,8 +297,6 @@ def result():
     )
     # print(data)
     return jsonify(response_data), 200
-
-
 
 
 
