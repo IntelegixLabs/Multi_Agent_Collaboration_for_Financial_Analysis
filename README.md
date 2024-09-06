@@ -41,9 +41,10 @@ $ pip install -r requirements.txt
 $ python template_for_api_marketplace.py
 ```
 
-### Sample 
-![image](https://github.com/user-attachments/assets/68844880-7678-4240-a35f-3d58b8f19364)
+## Application Screenshots / <a href="">Demo.</a>
 
-![image](https://github.com/user-attachments/assets/b24d82a8-b6b7-4baa-9638-0cbe672f2608)
-
-![image](https://github.com/user-attachments/assets/a09abae9-3f62-43ef-8c85-5c022a209d01)
+<p align="center">
+  <img src="data/1.png" width="400"/>
+  <img src="data/2.png" width="400"/>
+  <img src="data/3.png" width="400"/>
+</p>
