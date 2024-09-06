@@ -44,7 +44,7 @@ $ python template_for_api_marketplace.py
 ## Application Screenshots / <a href="">Demo.</a>
 
 <p align="center">
-  <img src="data/1.png" width="400"/>
-  <img src="data/2.png" width="400"/>
-  <img src="data/3.png" width="400"/>
+  <img src="data/1.png" />
+  <img src="data/2.png" />
+  <img src="data/3.png" />
 </p>
