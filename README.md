@@ -23,6 +23,27 @@ So, whether you’re decoding market signals, predicting trends, or optimizing p
   <img src="data/Multi-Agent Financial Analysis Tool.png" />
 </p> 
 
+### Steps to run financial-analysis application:
+```sh 
+$ git clone https://github.com/IntelegixLabs/Multi_Agent_Collaboration_for_Financial_Analysis.git
+$ cd Multi_Agent_Collaboration_for_Financial_Analysis
+$ copy .env.example to inside docker folder as .env
+```
+run below command for linux/mac
+```shell
+$ chmod +x docker-run.sh
+$ run ./docker-run.sh 
+```
+run below command for specially for Windows system
+```shell
+$ docker-run.bat
+```
+run below command for specially if you have only powershell on windows
+```shell
+$ Set-ExecutionPolicy RemoteSigned -Scope Process
+$ ./docker-run.ps1
+```
+
 ### Steps to run streamlit application:
 
 ```sh 
