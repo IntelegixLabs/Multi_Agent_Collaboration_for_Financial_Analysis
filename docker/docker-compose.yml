@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  api_marketplace:
+    build:
+      context: "../../Multi_Agent_Collaboration_for_Financial_Analysis"
+      dockerfile: "docker/flask_app/Dockerfile"
+    volumes:
+      - ../../Multi_Agent_Collaboration_for_Financial_Analysis:/app:cached
+    stdin_open: true
+    tty: true
+    ports:
+      - "5000:5000"
+    container_name: api_marketplace
+    env_file:
+      - .env
+  streamlit_app:
+    build:
+      context: "../../Multi_Agent_Collaboration_for_Financial_Analysis"
+      dockerfile: "docker/streamlit_app/Dockerfile"
+    volumes:
+      - ../../Multi_Agent_Collaboration_for_Financial_Analysis:/app:cached
+    stdin_open: true
+    tty: true
+    ports:
+      - "8501:8501"
+    container_name: streamlit_app
+    env_file:
+      - .env
