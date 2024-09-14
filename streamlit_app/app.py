@@ -26,18 +26,10 @@ st.markdown("""
     </p>
     <p class="analysis-content">
         Please note, this analysis is for informational purposes only and should not be construed as financial or investment advice.
-    </p>
-        <p class="divider-content">
-        ----------------------------------------------------------------------------------------------------------------------------
-    </p>
 </div>
 """, unsafe_allow_html=True)
 
-# Model selection
-# model_option = st.sidebar.selectbox("Select LLM Model", ['Llama 3 8B', 'Llama 3.1 70B', 'Llama 3.1 8B'])
-# groq_api_key = st.sidebar.text_input("Enter Groq API Key", type="password")
-
-stock_symbol = st.sidebar.text_input("Enter Stock Symbol", value="AAPL")
+stock_symbol = st.sidebar.text_input("Enter Stock Symbol", value="NVDA", placeholder="META, AAPL, NVDA")
 time_period = st.sidebar.selectbox("Select Time Period", ['1mo', '3mo', '6mo', '1y', '2y', '5y', 'max'])
 indicators = st.sidebar.multiselect("Select Indicators", ['Moving Averages', 'Volume', 'RSI', 'MACD'])
 analyze_button = st.sidebar.button("📊 Analyze Stock", help="Click to start the stock analysis")
@@ -125,9 +117,7 @@ if analyze_button:
     # Create and run the crew
     with st.spinner("Running analysis, please wait..."):
         
-        st.session_state.result_file_path = crew_creator(stock_symbol,
-                                                        #   model_option, groq_api_key
-                                                        )
+        st.session_state.result_file_path = crew_creator(stock_symbol)
     
     st.session_state.analyzed = True
 
@@ -152,7 +142,8 @@ if st.session_state.result_file_path:
         
     # with open(st.session_state.result_file_path, 'r') as file:
     #     result = file.read()
-        
+    st.markdown("---")
+
     st.markdown(st.session_state.result_file_path)
 
 # Display chart
