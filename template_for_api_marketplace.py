@@ -56,8 +56,8 @@ webhook_url = "https://marketplace-api-user.dev.devsaitech.com/api/v1/ai-connect
 
 
 ############### ADD YOUR CUSTOM AI AGENT CALL HERE ###############
-def hello_world():
-    stock_selection = "AAPL"
+def hello_world(user_input="META"):
+    stock_selection = user_input
     start_time = time.time()
 
     trading_strategy_agent = Agent(
@@ -167,9 +167,12 @@ def call_endpoint():
     response = {"taskId": task_id}
     error_code = {"status": StatusCodes.PENDING, "reason": "Pending"}
     respose_data = response_template(requestId, trace_id, -1, False, response, error_code)
-
+    payload_data = request.get_json(cache=False)
+    user_stock_input = payload_data["payload"]["userInput"]
+    print("----------- User input ----------")
+    print(user_stock_input)
     # Task processing in a separate thread
-    threading.Thread(target=process_task, args=(task_id,requestId,user_id,)).start()
+    threading.Thread(target=process_task, args=(task_id,requestId,user_id,user_stock_input)).start()
 
     # Immediate response to the client
     return jsonify(respose_data), 200
@@ -189,8 +192,8 @@ def success_response(task_id, data, dataType, requestId, trace_id, process_durat
 
 
 
-def process_task(task_id,requestId, user_id):
-    data, processing_duration = hello_world()
+def process_task(task_id,requestId, user_id, user_input):
+    data, processing_duration = hello_world(user_input)
     print(data)
     # Send the callback
     send_callback(user_id, task_id,requestId,processing_duration, data)
