@@ -69,3 +69,18 @@ $ python template_for_api_marketplace.py
   <img src="data/2.png" />
   <img src="data/3.png" />
 </p>
+
+## Deployment Steps
+```
+HARBOR LOGIN URL:
+https://registry.ai.aitech.io/
+
+COMMANDS TO RUN:
+docker image build -t your-image-name .
+
+docker run -p 5000:5000 your-image-name
+
+docker tag your-image-name registry.ai.aitech.io/harbor-username/your-image-name:1720072477
+
+docker push registry.ai.aitech.io/harbor-username/your-image-name:1720072477
+```
