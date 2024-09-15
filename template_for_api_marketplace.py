@@ -18,16 +18,23 @@ from api.models import AudioCraftRequestCall,AudioCraftRequestResult, response_t
 from crewai import Agent, Task, Crew
 from crewai_tools import ScrapeWebsiteTool, SerperDevTool
 from crewai import Crew, Process
-from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
 
 # Load environment variables
 load_dotenv()  # Take environment variables from.env.
 app.config.from_object(__name__)  # Load config from object
 
-
-
 SERPER_API_KEY = os.getenv('SERPER_API_KEY')
-llm = ChatGroq(groq_api_key=os.getenv('GROQ_API_KEY'), model='llama-3.1-70b-versatile', temperature=0.1)
+SAMBAVERSE_API_KEY = os.getenv('SAMBANOVA_API_KEY')
+SAMBANOVA_API_URL = "https://api.sambanova.ai/v1"
+
+llm = ChatOpenAI(
+        model="Meta-Llama-3.1-8B-Instruct-8k",
+        temperature=0.5,
+        max_retries=2,
+        base_url=SAMBANOVA_API_URL,  
+        api_key=SAMBAVERSE_API_KEY,
+    )
 
 search_tool = SerperDevTool()
 scrape_tool = ScrapeWebsiteTool()
@@ -43,29 +50,15 @@ MAX_DURATION = 10
 
 
 ############### ADD YOUR AI MARKETPLACE WEBHOOK ENDPOINT HERE ###############
-webhook_url = "http://localhost:8000/callback"
-# webhook_url = "https://marketplace-api-user.dev.devsaitech.com/api/v1/ai-connection/callback"
+# webhook_url = "http://localhost:8000/callback"
+# webhook_url = "https://62fb-2405-201-9001-8a8-29db-fdf5-fe8d-5f3b.ngrok-free.app"
+webhook_url = "https://marketplace-api-user.dev.devsaitech.com/api/v1/ai-connection/callback"
 
 
 ############### ADD YOUR CUSTOM AI AGENT CALL HERE ###############
 def hello_world():
     stock_selection = "AAPL"
     start_time = time.time()
-
-    data_analyst_agent = Agent(
-        role="Data Analyst",
-        goal="Monitor and analyze market data in real-time "
-             "to identify trends and predict market movements.",
-        backstory="Specializing in financial markets, this agent "
-                  "uses statistical modeling and machine learning "
-                  "to provide crucial insights. With a knack for data, "
-                  "the Data Analyst Agent is the cornerstone for "
-                  "informing trading decisions.",
-        verbose=True,
-        allow_delegation=True,
-        tools=[scrape_tool, search_tool],
-        llm=llm,
-    )
 
     trading_strategy_agent = Agent(
         role="Trading Strategy Developer",
@@ -80,21 +73,6 @@ def hello_world():
         allow_delegation=True,
         tools=[scrape_tool, search_tool],
         llm=llm,
-    )
-
-    # Task for Data Analyst Agent: Analyze Market Data
-    data_analysis_task = Task(
-        description=(
-            "Continuously monitor and analyze market data for "
-            "the selected stock ({stock_selection}). "
-            "Use statistical modeling and machine learning to "
-            "identify trends and predict market movements."
-        ),
-        expected_output=(
-            "Insights and alerts about significant market "
-            "opportunities or threats for {stock_selection}."
-        ),
-        agent=data_analyst_agent,
     )
 
     # Task for Trading Strategy Agent: Develop Trading Strategies
@@ -115,17 +93,11 @@ def hello_world():
     # Define the crew with agents and tasks
     financial_trading_crew = Crew(
         agents=[
-            data_analyst_agent,
             trading_strategy_agent,
-            # execution_agent,
-            # risk_management_agent
         ],
 
         tasks=[
-            data_analysis_task,
             strategy_development_task,
-            # execution_planning_task,
-            # risk_assessment_task
         ],
 
         manager_llm=llm,
@@ -135,10 +107,6 @@ def hello_world():
 
     result = financial_trading_crew.kickoff(inputs={
         'stock_selection': stock_selection,
-        # 'initial_capital': initial_capital,
-        # 'risk_tolerance': risk_tolerance,
-        # 'trading_strategy_preference': trading_strategy_preference,
-        # 'news_impact_consideration': news_impact_consideration
     })
 
     time.sleep(5)  # Placeholder for actual task processing
