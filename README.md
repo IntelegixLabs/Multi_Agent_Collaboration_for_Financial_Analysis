@@ -80,6 +80,8 @@ docker image build -t your-image-name .
 
 docker run -p 5000:5000 your-image-name
 
+docker login https://registry.ai.aitech.io/
+
 docker tag your-image-name registry.ai.aitech.io/harbor-username/your-image-name:1720072477
 
 docker push registry.ai.aitech.io/harbor-username/your-image-name:1720072477
